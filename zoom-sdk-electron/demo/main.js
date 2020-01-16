@@ -85,6 +85,8 @@ function sdkauthCB(status) {
     zoomshare = zoommeeting.GetMeetingShare();
     zoomh323 = zoommeeting.GetMeetingH323();
     zoomconfiguration = zoommeeting.GetMeetingConfiguration();
+    zoomconfiguration.MeetingConfig_DisableAutoShowSelectJoinAudioDlgWhenJoinMeeting({bEnable:true});
+    zoomconfiguration.MeetingConfig_EnableAudioButtonOnMeetingUI({bEnable:true})
     zoomupdateaccount = zoommeeting.GetUpdateAccount();
 
     let optsaudio = {
@@ -108,6 +110,10 @@ function sdkauthCB(status) {
     zoomsetrecord = zoomsetting.GetRecordingSetting();
     zoomsetvideo = zoomsetting.GetVideoSetting();
     zoomsetaudio = zoomsetting.GetAudioSetting();
+    zoomsetaudio.Setting_EnableMicOriginalInput({bEnable:true})
+    zoomsetaudio.Setting_IsMicOriginalInputEnable({bEnable:true})
+    zoomsetaudio.Setting_EnableEchoCancellation({bEnable:false})
+    zoomsetaudio.Setting_IsEchoCancellationEnabled({bEnable:false})
     zoomsetui = zoomsetting.GetSettingUICtrl();
     zoomsetstatistic = zoomsetting.GetSettingStatisticCtrl();
     zoomsetaccessibility = zoomsetting.GetSettingAccessibilityCtrl();
@@ -166,6 +172,8 @@ function onUserVideoStatusChange(result) {
 
 function meetingstatuscb(status, result) {
   console.log('meetingstatus', status, result);
+
+  
   switch (status)
   {
     case ZoomMeetingStatus.MEETING_STATUS_CONNECTING:
@@ -177,9 +185,15 @@ function meetingstatuscb(status, result) {
     break;
     case ZoomMeetingStatus.MEETING_STATUS_INMEETING:
       // showInMeetingWindow();
+      zoomsetaudio.Setting_EnableMicOriginalInput({bEnable:true})
+      zoomsetaudio.Setting_IsMicOriginalInputEnable({bEnable:true})
+      // zoomaudio.MeetingAudio_MuteAudio({userid: myId,allowunmutebyself: true})
+      zoomaudiorawdata.Stop()
+      zoomuicontroller.MeetingUI_HideJoinAudioDlg()
       let opts = {
         userid: myId
       }
+
       let ret = zoomvideo.MeetingVideo_UnMuteVideo(opts);
       zoomuicontroller.MeetingUI_SwtichToAcitveSpeaker()
       YUVWindow ? YUVWindow.webContents.send('main-process-meetingstatus', 'inmeeting'): null;
@@ -787,6 +801,8 @@ let functionObj = {
   },
   handleZoomWebUriProtocolAction: function(protocol_action) {
     let ret = zoommeeting.HandleZoomWebUriProtocolAction(protocol_action);
+    zoomsetaudio.Setting_EnableMicOriginalInput({bEnable:true})
+    zoomsetaudio.Setting_IsMicOriginalInputEnable({bEnable:true})
     console.log('HandleZoomWebUriProtocolAction', ret);
     return ret;
   },
@@ -1141,7 +1157,7 @@ let functionObj = {
   },
   enableMicOriginalInput: function(bEnable) {
     let opts = {
-      bEnable: bEnable
+      bEnable: true
     }
     let ret = zoomsetaudio.Setting_EnableMicOriginalInput(opts);
     console.log('EnableMicOriginalInput', ret);
@@ -1190,14 +1206,14 @@ let functionObj = {
   },
   enableEchoCancellation: function(bEnable) {
     let opts = {
-      bEnable: bEnable
+      bEnable: false
     }
     let ret = zoomsetaudio.Setting_EnableEchoCancellation(opts);
     console.log('EnableEchoCancellation', ret);
   },
   isEchoCancellationEnabled: function(bEnable) {
     let opts = {
-      bEnable: bEnable
+      bEnable: false
     }
     let ret = zoomsetaudio.Setting_IsEchoCancellationEnabled(opts);
     console.log('IsEchoCancellationEnabled', ret);
@@ -1232,7 +1248,7 @@ let functionObj = {
   },
   isMicOriginalInputEnable: function(bEnable) {
     let opts = {
-      bEnable: bEnable
+      bEnable: true
     }
     let ret = zoomsetaudio.Setting_IsMicOriginalInputEnable(opts);
     console.log('isMicOriginalInputEnable', ret);
@@ -2746,3 +2762,5 @@ if (ZoomSDKError.SDKERR_SUCCESS == checkInit){
   zoomauth = zoomsdk.GetAuth(options);
   zoomauth.SDKAuth('UjaZd0wuECGo9LLEWP7a8c6cRddzIlvyhAd8', 'LaIzLqSbjYEZYbHTsWnOcXqne2HtEodYu7W0');
 }
+
+// zoomconfiguration.MeetingConfig_DisableAutoShowSelectJoinAudioDlgWhenJoinMeeting({bEnable:true});

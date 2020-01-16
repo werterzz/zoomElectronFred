@@ -63,17 +63,30 @@ const intervalObj = setInterval(() => {
       serverIP = secureTunnel.public_url
       // opn('http://localhost:3000/', { app: ['chrome'] });
 
-      const { exec } = require('child_process');
-exec('electron ..\\zoom-sdk-electron\\demo', (err, stdout, stderr) => {
-  if (err) {
-    // node couldn't execute the command
-    return;
-  }
 
-  // the *entire* stdout and stderr (buffered)
-  console.log(`stdout: ${stdout}`);
-  console.log(`stderr: ${stderr}`);
-});
+      qrcode.toFile('./public/images/testqr.svg', serverIP + '/login', {
+        color: {
+          dark: '#000',  // Blue dots
+          light: '#0000' // Transparent background
+        },
+    
+      }, function (err) {
+        if (err) throw err
+        console.log('done')
+        // res.render('index');
+      })
+
+//       const { exec } = require('child_process');
+// exec('electron ..\\zoom-sdk-electron\\demo', (err, stdout, stderr) => {
+//   if (err) {
+//     // node couldn't execute the command
+//     return;
+//   }
+
+//   // the *entire* stdout and stderr (buffered)
+//   console.log(`stdout: ${stdout}`);
+//   console.log(`stderr: ${stderr}`);
+// });
       let { PythonShell } = require('python-shell')
       PythonShell.run('startupChrome.py', { pythonOptions: ['-u'], args: [] }, function (err, result) {
         if (err) console.log(err);
